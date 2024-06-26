@@ -86,7 +86,12 @@ def convert_md_to_pdf(md_file: str) -> None:
     # pdfkit.from_string(html_content, pdf_file) # Doesn't work, needs a set configuration
     pdfkit.from_string(html_content, pdf_file, configuration=config)
 
-def main(idea_for_satire: str = "") -> None: # Allows the script to try again if it fails to parse the prompt
+def main(idea_for_satire: str = "", tries: int = 1) -> None: # Allows the script to try again if it fails to parse the prompt
+    if tries > 4:
+        exit("Your input is causing problems. Please try again with a different prompt.")
+    else:
+        print(f"Attempt {tries}")
+
     if idea_for_satire == "": 
         idea_for_satire = input("Enter an idea for a satire story: ")
 
@@ -100,8 +105,8 @@ def main(idea_for_satire: str = "") -> None: # Allows the script to try again if
         story_dict = eval(story)
         print("Parsed API response successfully.")
     except SyntaxError:
-        print("Unexpected API response. Trying again.")
-        main(idea_for_satire)
+        print("Unexpected API response. Trying again...")
+        main(idea_for_satire, tries + 1)
 
     # Turn the story into a formatted markdown file
     print("Creating markdown file...")
