@@ -2,6 +2,15 @@ import sys
 import time
 import threading
 
+class Cursor:
+    def show():
+        sys.stdout.write("\033[?25h")
+        sys.stdout.flush()
+
+    def hide():
+        sys.stdout.write("\033[?25l")
+        sys.stdout.flush()
+
 class Spinner:
     def __init__(self, function, delay=0.1):
         self.function = function
@@ -26,15 +35,18 @@ class Spinner:
         self.thread = threading.Thread(target=self._spin)
         self.thread.start()
         try:
+            Cursor.hide()
             result = self.function(*args, **kwargs)
         finally:
             self.stop()
+            Cursor.show()
         return result
 
     def stop(self):
         self.done = True
         self.thread.join()
-        sys.stdout.write('Done!\n')
+        # sys.stdout.write('Done!\n')
+        sys.stdout.write('')
         sys.stdout.flush()
 
 # Example usage

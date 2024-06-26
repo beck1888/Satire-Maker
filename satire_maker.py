@@ -40,28 +40,49 @@ def make_a_satire_article(idea: str) -> str:
 
 def make_md_version_of_story(story_dict: dict) -> str: # Markdown is easier to layout
     # Create variables from the dictionary
-    headline = story_dict["headline"]
-    location = story_dict["location"]
-    story = story_dict["story"]
-    recommended_headline_1 = story_dict["recommended_headlines"][0]
-    recommended_headline_2 = story_dict["recommended_headlines"][1]
+
+    # These assignments often raise KeyErrors but still contain the correct information so using try/except statements should just hide errors
+    try:
+        headline = story_dict["headline"]
+    except:
+        headline = ""
+
+    try:
+        location = story_dict["location"]
+    except:
+        location = ""
+
+    try:
+        story = story_dict["story"]
+    except:
+        story = ""
+
+    try:
+        recommended_headline_1 = story_dict["recommended_headlines"][0]
+    except:
+        recommended_headline_1 = ""
+
+    try:
+        recommended_headline_2 = story_dict["recommended_headlines"][1]
+    except:
+        recommended_headline_2 = ""
 
     # Pick two random up next headline intros
-    all_headline_intros = ["This just in:", "Readers also liked:", "You might like:", "Related and funny:", "Check out:", "Breaking news:", "Shocking:", "Follow up:"]
+    all_headline_intros = ["This just in:", "Readers also liked:", "You might like:", "Related and funny:", "Check out:", "Breaking news:", "Shocking:", "Follow up:", "Consider checking out:", "Take a look at:"]
 
     headline_intros = random.sample(all_headline_intros, 2)
 
     # Create the markdown version of the story
     md_story = f"""
-    # {headline}
+    # {headline.upper()}
 
     *{location}* - {story}
 
     ---
 
-    **{headline_intros[0]}** {recommended_headline_1}
+    **{headline_intros[0].upper()}** {recommended_headline_1.title()}
 
-    **{headline_intros[1]}** {recommended_headline_2}
+    **{headline_intros[1].upper()}** {recommended_headline_2.title()}
     """
 
     # Make the headline name for friendly to operating systems
@@ -110,7 +131,8 @@ def main(idea_for_satire: str = "", tries: int = 1) -> None: # Allows the script
     if tries > 4:
         exit("Your input is causing problems. Please try again with a different prompt.")
     else:
-        print(f"Attempt {tries}")
+        # print(f"Attempt {tries}")
+        pass
 
     if idea_for_satire == "": 
         idea_for_satire = input("Enter an idea for a satire story or press enter to automatically generate one: ")
@@ -118,12 +140,12 @@ def main(idea_for_satire: str = "", tries: int = 1) -> None: # Allows the script
             with open("headline_ideas.json") as f:
                 headline_ideas = json.load(f)
             idea_for_satire = random.choice(headline_ideas)
-            print(f"Auto generated idea: {idea_for_satire}")
+            # print(f"Auto generated idea: {idea_for_satire}")
 
     story_maker = tt.Spinner(make_a_satire_article) # Pass the function as an argument
-    print("Contacting the API...")
+    # print("Contacting the API...")
     story = story_maker.run(idea_for_satire) # Pass the idea as an argument and show a spinner while the function is running
-    print("API response received.")
+    # print("API response received.")
 
     # Initialize the story dictionary to avoid a unbound error
     story_dict = {}
@@ -131,34 +153,34 @@ def main(idea_for_satire: str = "", tries: int = 1) -> None: # Allows the script
     # Convert the response string to a dictionary
     try:
         story_dict = eval(story)
-        print("Parsed API response successfully.")
+        # print("Parsed API response successfully.")
     except SyntaxError:
-        print("Unexpected API response. Trying again...")
+        # print("Unexpected API response. Trying again...")
         main(idea_for_satire, tries + 1)
 
     # Turn the story into a formatted markdown file
-    print("Creating markdown file...")
+    # print("Creating markdown file...")
     saved_file = make_md_version_of_story(story_dict)
-    print("Markdown file created.")
+    # print("Markdown file created.")
 
     # Convert the markdown file to a pdf
-    print("Converting markdown to pdf...")
+    # print("Converting markdown to pdf...")
     make_pdf = tt.Spinner(convert_md_to_pdf)
     make_pdf.run(saved_file)
-    print("Markdown converted to pdf.")
+    # print("Markdown converted to pdf.")
 
     # Clean up all markdown files in the articles directory
-    print("Cleaning up markdown files...")
+    # print("Cleaning up markdown files...")
     for file in os.listdir("articles"):
         if file.endswith(".md"):
             os.remove(f"articles/{file}")
     
     # Show the pdf
-    print("Opening pdf...")
-    os.system(f"open {saved_file[:-3]}.pdf")
-    print("Pdf opened.")
+    # print("Opening pdf...")
+    os.system(f"open {saved_file.removesuffix('.md').removesuffix('.pdf')}.pdf")
+    # print("Pdf opened.")
 
-    print("Done!")
+    # print("Done!")
 
 if __name__ == "__main__":
     main()
