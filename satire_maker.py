@@ -177,7 +177,17 @@ def main(idea_for_satire: str = "", tries: int = 1) -> None: # Allows the script
     
     # Show the pdf
     # print("Opening pdf...")
-    os.system(f"open {saved_file.removesuffix('.md').removesuffix('.pdf')}.pdf")
+
+    # Clean up possible old pdf junk file
+    try:
+        os.remove("articles/.pdf")
+    except:
+        pass
+
+    # Open the pdf
+    saved_file = saved_file.removeprefix('articles/').removesuffix('.md')
+    os.system(f"open articles/{saved_file}.pdf")
+    # os.system(f"open {saved_file.removesuffix('.md').removesuffix('.pdf')}.pdf")
     # print("Pdf opened.")
 
     # print("Done!")
