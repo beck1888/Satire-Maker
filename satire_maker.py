@@ -2,7 +2,10 @@ import openai
 import markdown
 import pdfkit
 import os
+import json
+import random
 import terminal_tools as tt
+# from image_maker import generate_image_from_headline
 
 def verify_api_key() -> None:
     # Verify an environment file exists
@@ -43,6 +46,11 @@ def make_md_version_of_story(story_dict: dict) -> str: # Markdown is easier to l
     recommended_headline_1 = story_dict["recommended_headlines"][0]
     recommended_headline_2 = story_dict["recommended_headlines"][1]
 
+    # Pick two random up next headline intros
+    all_headline_intros = ["This just in:", "Readers also liked:", "You might like:", "Related and funny:", "Check out:", "Breaking news:", "Shocking:", "Follow up:"]
+
+    headline_intros = random.sample(all_headline_intros, 2)
+
     # Create the markdown version of the story
     md_story = f"""
     # {headline}
@@ -51,9 +59,9 @@ def make_md_version_of_story(story_dict: dict) -> str: # Markdown is easier to l
 
     ---
 
-    **Readers liked:** {recommended_headline_1}
+    **{headline_intros[0]}** {recommended_headline_1}
 
-    **This just in:** {recommended_headline_2}
+    **{headline_intros[1]}** {recommended_headline_2}
     """
 
     # Make the headline name for friendly to operating systems
@@ -105,12 +113,20 @@ def main(idea_for_satire: str = "", tries: int = 1) -> None: # Allows the script
         print(f"Attempt {tries}")
 
     if idea_for_satire == "": 
-        idea_for_satire = input("Enter an idea for a satire story: ")
+        idea_for_satire = input("Enter an idea for a satire story or press enter to automatically generate one: ")
+        if idea_for_satire == "":
+            with open("headline_ideas.json") as f:
+                headline_ideas = json.load(f)
+            idea_for_satire = random.choice(headline_ideas)
+            print(f"Auto generated idea: {idea_for_satire}")
 
     story_maker = tt.Spinner(make_a_satire_article) # Pass the function as an argument
     print("Contacting the API...")
     story = story_maker.run(idea_for_satire) # Pass the idea as an argument and show a spinner while the function is running
     print("API response received.")
+
+    # Initialize the story dictionary to avoid a unbound error
+    story_dict = {}
 
     # Convert the response string to a dictionary
     try:
