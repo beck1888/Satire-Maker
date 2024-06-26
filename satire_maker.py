@@ -51,9 +51,9 @@ def make_md_version_of_story(story_dict: dict) -> str: # Markdown is easier to l
 
     ---
 
-    **Readers can also read:** {recommended_headline_1}
+    **Readers liked:** {recommended_headline_1}
 
-    **We think you may also like:** {recommended_headline_2}
+    **This just in:** {recommended_headline_2}
     """
 
     # Make the headline name for friendly to operating systems
