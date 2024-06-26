@@ -4,6 +4,21 @@ import pdfkit
 import os
 import terminal_tools as tt
 
+def verify_api_key() -> None:
+    # Verify an environment file exists
+    if ".env" not in os.listdir():
+        exit("ERROR: No environment file found. Please create a .env file with your OpenAI API key.")
+
+    # Verify there is an API key in the environment file
+    with open(".env") as f:
+        if "OPENAI_API_KEY=\"" not in f.read():
+            exit("ERROR: No API key found in the .env file. Please add your OpenAI API key to the .env file like this: OPENAI_API_KEY=\"your_api_key_here\".")
+
+    return
+
+    # Verify the API key is valid
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+
 path_wkhtmltopdf = '/usr/local/bin/wkhtmltopdf'  # Path based to installation
 config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
 
@@ -87,6 +102,8 @@ def convert_md_to_pdf(md_file: str) -> None:
     pdfkit.from_string(html_content, pdf_file, configuration=config)
 
 def main(idea_for_satire: str = "", tries: int = 1) -> None: # Allows the script to try again if it fails to parse the prompt
+    verify_api_key()
+
     if tries > 4:
         exit("Your input is causing problems. Please try again with a different prompt.")
     else:
