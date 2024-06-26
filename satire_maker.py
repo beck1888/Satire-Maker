@@ -14,11 +14,6 @@ def verify_api_key() -> None:
         if "OPENAI_API_KEY=\"" not in f.read():
             exit("ERROR: No API key found in the .env file. Please add your OpenAI API key to the .env file like this: OPENAI_API_KEY=\"your_api_key_here\".")
 
-    return
-
-    # Verify the API key is valid
-    openai.api_key = os.getenv("OPENAI_API_KEY")
-
 path_wkhtmltopdf = '/usr/local/bin/wkhtmltopdf'  # Path based to installation
 config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)
 
